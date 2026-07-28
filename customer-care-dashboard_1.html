@@ -1,8 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Care Desk — Customer Care Dashboard</title>
+
+<!--
+  ==========================================================================
+  SETUP — do these three things before this page will work
+  ==========================================================================
+  1. In Supabase: SQL Editor -> paste the contents of supabase-setup.sql -> Run
+  2. In Supabase: Settings -> API -> copy your Project URL and the "anon public" key
+  3. Down in the <script> tag below, find the CONFIG block (it's the first
+     thing in there) and paste those two values in.
+  4. In Supabase: Authentication -> Users -> Add user -> create one account per
+     person on the care team (email + password, tick "Auto Confirm User").
+     Authentication -> Providers -> Email: turn OFF "Enable sign ups" so only
+     accounts you create by hand can get in.
+
+  Then commit both files to your repo and turn on GitHub Pages
+  (Settings -> Pages -> Deploy from a branch -> main -> / root).
+  Add an empty file named .nojekyll at the repo root too.
+  ==========================================================================
+-->
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-.sl-root {
-  position: relative;
+html, body { margin: 0; padding: 0; background: #12161d; }
+
+:root {
   --ink: #12161d;
   --panel: #1a2029;
   --card: #222a35;
@@ -22,6 +49,10 @@
   --text: #ece8dd;
   --text-muted: #8d96a6;
   --text-dim: #5c6472;
+}
+
+.sl-root {
+  position: relative;
   font-family: 'IBM Plex Sans', sans-serif;
   background: var(--ink);
   color: var(--text);
@@ -49,6 +80,33 @@
 .sl-stat-num.teal { color: var(--teal); }
 .sl-stat-num.blue { color: var(--blue); }
 .sl-stat-num.purple { color: var(--purple); }
+
+/* Connection pill */
+.sl-conn { font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border); color: var(--text-dim); white-space: nowrap; cursor: default; }
+.sl-conn.ok { color: var(--teal); border-color: var(--teal); }
+.sl-conn.bad { color: var(--coral); border-color: var(--coral); cursor: help; }
+
+/* Login gate */
+.sl-login { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 32px 20px; font-family: 'IBM Plex Sans', sans-serif; }
+.sl-login.show { display: flex; }
+.sl-login-card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 30px 32px; width: 100%; max-width: 400px; box-sizing: border-box; }
+.sl-login-card .sl-wordmark { display: flex; align-items: center; gap: 12px; }
+.sl-login-card .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 4px var(--amber-dim); }
+.sl-login-card .sl-title { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 22px; letter-spacing: 0.5px; margin: 0; color: var(--text); }
+.sl-login-sub { color: var(--text-muted); font-size: 13px; margin: 10px 0 22px; line-height: 1.5; }
+.sl-login-label { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin: 14px 0 6px; }
+.sl-login-input { width: 100%; box-sizing: border-box; background: var(--card); border: 1px solid var(--border); border-radius: 7px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; padding: 10px 11px; outline: none; }
+.sl-login-input:focus { border-color: var(--amber-dim); }
+.sl-login-err { display: none; color: var(--coral); font-size: 12.5px; line-height: 1.5; margin-top: 14px; }
+.sl-login-err.show { display: block; }
+.sl-login-foot { color: var(--text-dim); font-size: 11.5px; margin-top: 18px; text-align: center; line-height: 1.5; }
+.sl-signout { text-decoration: underline; cursor: pointer; }
+
+/* Setup / error banner */
+.sl-banner { display: none; background: #3a2318; border: 1px solid var(--coral); border-radius: 9px; padding: 13px 16px; margin-bottom: 18px; font-size: 13px; line-height: 1.6; color: #f3c9c0; }
+.sl-banner.show { display: block; }
+.sl-banner b { color: var(--coral); }
+.sl-banner code { font-family: 'IBM Plex Mono', monospace; font-size: 12px; background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px; }
 
 /* Tabs */
 .sl-tabs { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
@@ -280,16 +338,44 @@
   .sl-directory-table td { border-bottom: none; padding: 2px 0; }
 }
 </style>
+</head>
+<body>
 
-<div class="sl-root" id="slRoot">
+<div class="sl-login" id="slLogin">
+  <form class="sl-login-card" id="slLoginForm" autocomplete="on">
+    <div class="sl-wordmark"><span class="dot"></span><h1 class="sl-title">CARE DESK</h1></div>
+    <div class="sl-login-sub" id="slLoginSub">Sign in to see the team's signals, patterns and knowledge base.</div>
+
+    <label class="sl-login-label" for="slEmail">Work email</label>
+    <input class="sl-login-input" id="slEmail" type="email" autocomplete="username" required />
+
+    <label class="sl-login-label" for="slPass">Password</label>
+    <input class="sl-login-input" id="slPass" type="password" autocomplete="current-password" required />
+
+    <div class="sl-login-err" id="slLoginErr"></div>
+
+    <button class="sl-btn sl-btn-primary" id="slLoginBtn" type="submit" style="width:100%; margin-top:18px;">Sign in</button>
+
+    <div class="sl-login-foot">No account yet? Whoever set this up can add you under<br>Supabase → Authentication → Users.</div>
+  </form>
+</div>
+
+<div class="sl-root" id="slRoot" style="display:none;">
 
   <div class="sl-header">
     <div>
-      <div class="sl-wordmark"><span class="dot"></span><h1 class="sl-title">CARE DESK</h1></div>
+      <div class="sl-wordmark">
+        <span class="dot"></span>
+        <h1 class="sl-title">CARE DESK</h1>
+        <span class="sl-conn" id="slConn" title="">connecting…</span>
+        <span class="sl-conn" id="slWho" style="display:none;"><span id="slWhoEmail"></span> · <span class="sl-signout" id="slSignOut">sign out</span></span>
+      </div>
       <div class="sl-subtitle">Customer Care Team Dashboard — one place to record what we see, learn, and fix</div>
     </div>
     <div class="sl-stats" id="slStats"></div>
   </div>
+
+  <div class="sl-banner" id="slBanner"></div>
 
   <div class="sl-tabs" id="slTabs">
     <div class="sl-tab primary active" data-tab="form">✎ Log Something</div>
@@ -297,7 +383,8 @@
     <div class="sl-tab" data-tab="patterns">Patterns<span class="sl-tab-count" id="tabCountPatterns"></span></div>
     <div class="sl-tab" data-tab="wins">What Works<span class="sl-tab-count" id="tabCountWins"></span></div>
     <div class="sl-tab" data-tab="knowledge">Knowledge Base<span class="sl-tab-count" id="tabCountKnowledge"></span></div>
-    <span class="sl-archived-toggle" id="openBackup" style="align-self:center; margin-left:auto;">backup / restore data</span>
+    <span class="sl-archived-toggle" id="slRefresh" style="align-self:center; margin-left:auto;">refresh</span>
+    <span class="sl-archived-toggle" id="openBackup" style="align-self:center; margin-left:14px;">backup / restore data</span>
   </div>
 
   <!-- ============ INTAKE FORM ============ -->
@@ -600,7 +687,17 @@
 
 <script>
 (function(){
-  const SHARED = true;
+
+  /* ======================================================================
+     CONFIG — PASTE YOUR SUPABASE VALUES HERE
+     Supabase dashboard -> Settings -> API
+     ====================================================================== */
+  const SUPABASE_URL      = 'https://ufipqwxmkhyojvrfijfw.supabase.co/rest/v1/';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVmaXBxd3hta2h5b2p2cmZpamZ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ3NTE5NTIsImV4cCI6MjEwMDMyNzk1Mn0.2kJcSZBrrr0HegVkMzfOzAWINE1adtQC_LG53G5LpEg';
+  const TABLE             = 'care_desk';
+  const REFRESH_MS        = 30000;   // how often to pull in teammates' changes
+  /* ====================================================================== */
+
   const STAGES = ['First Contact / Inquiry','Quote / Estimate','Scheduling / Dispatch','Delivery','On-Site Work / Install','Billing & Payments','Support Interaction','Follow-up / Warranty','Internal Tooling / Process','Other'];
   const PROBLEM_CATS = ['Recurring Problem','Process Gap','Tooling / System Issue','Communication Gap','Policy Question','Improvement Idea'];
   const KB_CATS = ['Company Policy','Procedure / Protocol','FAQ / Talking Point','Script / Template','Systems & Tools','Onboarding Basics'];
@@ -657,74 +754,319 @@
   function seedKnowledge(){ return []; }
   function seedDirectory(){
     const now = Date.now();
-    return [
-      { id: uid(), department: 'Eugene Irrigation Maintenance and Repair', extension: '1160', notes: 'Irrigation', updated: now },
-      { id: uid(), department: 'Eugene Irrigation New Installation Joey', extension: '1145', notes: 'Irrigation', updated: now },
-      { id: uid(), department: 'Bend Irrigation and Landscape', extension: '541-389-4974', notes: 'Irrigation', updated: now },
-      { id: uid(), department: 'Dump Delivery Kevin Roemer', extension: '2000', notes: 'Delivery', updated: now },
-      { id: uid(), department: 'Eugene Blower Jeff Davis', extension: '1153', notes: 'Delivery', updated: now },
-      { id: uid(), department: 'Hydroseeding JP Lee', extension: '1149', notes: 'Delivery', updated: now },
-      { id: uid(), department: 'Portland/Lake Oswego Blower Colby', extension: '541-359-7453', notes: 'Delivery', updated: now },
-      { id: uid(), department: 'Residential Ongoing Maintenance Jason Spies', extension: '1190', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Residential Landscape Installation Joey', extension: '1145', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Commercial Construction Mark Spies', extension: '1138', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Residential One Time Maintenance Project James Anderson', extension: '541-952-1762', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Existing Commercial Maintenance Bob/Coral/Zach/Jason', extension: 'See Directory', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'New Commercial Maintenance Bob Cokel', extension: '1126', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Flatbed Dispatch Dennis Clark', extension: '1140', notes: 'Landscape', updated: now },
-      { id: uid(), department: 'Biochar Jordan', extension: '1165', notes: 'Specialty', updated: now },
-      { id: uid(), department: 'Orchid Bark Joey', extension: '1145', notes: 'Specialty', updated: now },
-      { id: uid(), department: 'Bagger Joe Arbuckle', extension: '1115', notes: 'Specialty', updated: now },
-      { id: uid(), department: 'Payments / Accounts Receivable Nate', extension: '1179', notes: 'Misc', updated: now },
-      { id: uid(), department: 'Accounts Payable Tracey', extension: '1346', notes: 'Misc', updated: now },
-      { id: uid(), department: 'Safety / Driver Complaint Troy', extension: '1167', notes: 'Misc', updated: now },
-      { id: uid(), department: 'Payroll Kacey', extension: '1107', notes: 'Misc', updated: now },
-      { id: uid(), department: 'Shipping and Receiving / Freight Joey', extension: '1145', notes: 'Misc', updated: now },
-      { id: uid(), department: 'HR Karen', extension: '541-729-5353', notes: 'Misc', updated: now },
-      { id: uid(), department: 'Storage Containers / Boxes / Connexes Joey', extension: '1145', notes: 'Western Storage', updated: now },
-      { id: uid(), department: 'Hwy 99 Ian', extension: '706-768-1603', notes: 'Hwy 99', updated: now },
+    const rows = [
+      { department: 'Eugene Irrigation Maintenance and Repair', extension: '1160', notes: 'Irrigation' },
+      { department: 'Eugene Irrigation New Installation Joey', extension: '1145', notes: 'Irrigation' },
+      { department: 'Bend Irrigation and Landscape', extension: '541-389-4974', notes: 'Irrigation' },
+      { department: 'Dump Delivery Kevin Roemer', extension: '2000', notes: 'Delivery' },
+      { department: 'Eugene Blower Jeff Davis', extension: '1153', notes: 'Delivery' },
+      { department: 'Hydroseeding JP Lee', extension: '1149', notes: 'Delivery' },
+      { department: 'Portland/Lake Oswego Blower Colby', extension: '541-359-7453', notes: 'Delivery' },
+      { department: 'Residential Ongoing Maintenance Jason Spies', extension: '1190', notes: 'Landscape' },
+      { department: 'Residential Landscape Installation Joey', extension: '1145', notes: 'Landscape' },
+      { department: 'Commercial Construction Mark Spies', extension: '1138', notes: 'Landscape' },
+      { department: 'Residential One Time Maintenance Project James Anderson', extension: '541-952-1762', notes: 'Landscape' },
+      { department: 'Existing Commercial Maintenance Bob/Coral/Zach/Jason', extension: 'See Directory', notes: 'Landscape' },
+      { department: 'New Commercial Maintenance Bob Cokel', extension: '1126', notes: 'Landscape' },
+      { department: 'Flatbed Dispatch Dennis Clark', extension: '1140', notes: 'Landscape' },
+      { department: 'Biochar Jordan', extension: '1165', notes: 'Specialty' },
+      { department: 'Orchid Bark Joey', extension: '1145', notes: 'Specialty' },
+      { department: 'Bagger Joe Arbuckle', extension: '1115', notes: 'Specialty' },
+      { department: 'Payments / Accounts Receivable Nate', extension: '1179', notes: 'Misc' },
+      { department: 'Accounts Payable Tracey', extension: '1346', notes: 'Misc' },
+      { department: 'Safety / Driver Complaint Troy', extension: '1167', notes: 'Misc' },
+      { department: 'Payroll Kacey', extension: '1107', notes: 'Misc' },
+      { department: 'Shipping and Receiving / Freight Joey', extension: '1145', notes: 'Misc' },
+      { department: 'HR Karen', extension: '541-729-5353', notes: 'Misc' },
+      { department: 'Storage Containers / Boxes / Connexes Joey', extension: '1145', notes: 'Western Storage' },
+      { department: 'Hwy 99 Ian', extension: '706-768-1603', notes: 'Hwy 99' },
     ];
+    return rows.map((r, i) => Object.assign({ id: uid(), sort: i, updated: now }, r));
   }
 
-  /* ---------- STORAGE ---------- */
-  async function loadKey(key, seedFn){
+  /* ======================================================================
+     SUPABASE STORAGE LAYER
+     One table, keyed on (collection, id). Each record in each array is one
+     row, so two people editing different cards never overwrite each other.
+     ====================================================================== */
+
+  const configured = SUPABASE_URL.indexOf('YOUR-PROJECT-REF') === -1 && SUPABASE_ANON_KEY.indexOf('YOUR-ANON') === -1;
+  const REST = SUPABASE_URL.replace(/\/+$/, '') + '/rest/v1/' + TABLE;
+  let online = false;
+  let inFlight = 0;
+  const snapshots = {};   // collection -> { id: JSON string as last known to be saved }
+
+  /* ---------- AUTH (Supabase GoTrue, no SDK) ---------- */
+  const AUTH = SUPABASE_URL.replace(/\/+$/, '') + '/auth/v1';
+  let session = null;
+
+  function readStoredSession(){
+    try { const raw = localStorage.getItem('careDeskSession'); session = raw ? JSON.parse(raw) : null; }
+    catch(e){ session = null; }
+    return session;
+  }
+  function writeSession(s){
+    session = s;
     try {
-      const res = await window.storage.get(key, SHARED);
-      if (res && res.value) return JSON.parse(res.value);
-      const seed = seedFn();
-      if (seed.length) await window.storage.set(key, JSON.stringify(seed), SHARED);
-      return seed;
-    } catch(e) {
-      const seed = seedFn();
-      try { if (seed.length) await window.storage.set(key, JSON.stringify(seed), SHARED); } catch(e2){}
-      return seed;
+      if (s) localStorage.setItem('careDeskSession', JSON.stringify(s));
+      else localStorage.removeItem('careDeskSession');
+    } catch(e){}
+  }
+  function sessionFrom(json){
+    return {
+      access_token:  json.access_token,
+      refresh_token: json.refresh_token,
+      expires_at:    Date.now() + ((json.expires_in || 3600) * 1000),
+      email:         (json.user && json.user.email) || ''
+    };
+  }
+  async function authPost(path, body, bearer){
+    const res = await fetch(AUTH + path, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (bearer || SUPABASE_ANON_KEY)
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    let json = {};
+    try { json = await res.json(); } catch(e){}
+    if (!res.ok) {
+      throw new Error(json.error_description || json.msg || json.message || json.error || ('request failed (' + res.status + ')'));
+    }
+    return json;
+  }
+  async function signIn(email, password){
+    writeSession(sessionFrom(await authPost('/token?grant_type=password', { email: email, password: password })));
+  }
+  async function refreshSession(){
+    if (!session || !session.refresh_token) throw new Error('not signed in');
+    writeSession(sessionFrom(await authPost('/token?grant_type=refresh_token', { refresh_token: session.refresh_token })));
+  }
+  // Called before every database request. Refreshes a couple of minutes early
+  // so a long shift on one open tab never drops mid-save.
+  async function ensureSession(force){
+    if (!session) throw new Error('not signed in');
+    if (force || Date.now() > session.expires_at - 120000) await refreshSession();
+  }
+  function checkAuth(res){
+    if (res.status === 401) {
+      forceLogin('Your session expired. Sign in again to keep going.');
+      throw new Error('session expired');
     }
   }
-  async function persist(key, data){
-    try { await window.storage.set(key, JSON.stringify(data), SHARED); }
-    catch(e){ console.error('save failed', key, e); }
+  async function signOut(){
+    try { if (session) await authPost('/logout', null, session.access_token); } catch(e){}
+    writeSession(null);
+    location.reload();
   }
-  const persistSignals = () => persist('signals', signals);
-  const persistKnowledge = () => persist('knowledge', knowledge);
-  const persistDirectory = () => persist('directory', directory);
-  const persistPatterns = () => persist('patterns', patterns);
-  const persistWins = () => persist('wins', wins);
+  function showLogin(msg){
+    document.getElementById('slRoot').style.display = 'none';
+    document.getElementById('slLogin').classList.add('show');
+    const err = document.getElementById('slLoginErr');
+    if (msg) { err.textContent = msg; err.classList.add('show'); }
+    else { err.textContent = ''; err.classList.remove('show'); }
+    const em = document.getElementById('slEmail');
+    setTimeout(() => { if (em && !em.value) em.focus(); }, 50);
+  }
+  function forceLogin(msg){
+    online = false;
+    writeSession(null);
+    showLogin(msg);
+  }
+  function showApp(){
+    document.getElementById('slLogin').classList.remove('show');
+    document.getElementById('slRoot').style.display = '';
+    const who = document.getElementById('slWho');
+    document.getElementById('slWhoEmail').textContent = (session && session.email) || 'signed in';
+    who.style.display = '';
+  }
+
+  document.getElementById('slSignOut').addEventListener('click', signOut);
+  document.getElementById('slLoginForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    const btn = document.getElementById('slLoginBtn');
+    const email = document.getElementById('slEmail').value.trim();
+    const pass = document.getElementById('slPass').value;
+    if (!email || !pass) return;
+    btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      await signIn(email, pass);
+      document.getElementById('slPass').value = '';
+      document.getElementById('slLoginErr').classList.remove('show');
+      showApp();
+      await loadAll();
+    } catch(err) {
+      showLogin(/invalid/i.test(err.message) ? 'That email and password combination didn\'t work.' : err.message);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Sign in';
+    }
+  });
+
+  function hdrs(extra){
+    return Object.assign({
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + (session ? session.access_token : SUPABASE_ANON_KEY),
+      'Content-Type': 'application/json'
+    }, extra || {});
+  }
+  function setConn(state, msg){
+    const el = document.getElementById('slConn');
+    if (!el) return;
+    el.className = 'sl-conn' + (state === true ? ' ok' : state === false ? ' bad' : '');
+    el.textContent = state === true ? '● saving to Supabase' : state === false ? '● not saving' : 'connecting…';
+    el.title = msg || (state === true ? 'Connected. Changes are saved for the whole team.' : '');
+  }
+  function showBanner(html){
+    const b = document.getElementById('slBanner');
+    b.innerHTML = html; b.classList.add('show');
+  }
+  function hideBanner(){ document.getElementById('slBanner').classList.remove('show'); }
+
+  async function dbList(collection){
+    await ensureSession();
+    const res = await fetch(REST + '?collection=eq.' + encodeURIComponent(collection) + '&select=id,data', { headers: hdrs() });
+    checkAuth(res);
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0,200));
+    return (await res.json()).map(r => r.data).filter(Boolean);
+  }
+  async function dbUpsert(collection, records){
+    if (!records.length) return;
+    await ensureSession();
+    const body = records.map(r => ({ collection: collection, id: r.id, data: r, updated_at: new Date().toISOString() }));
+    const res = await fetch(REST + '?on_conflict=collection,id', {
+      method: 'POST',
+      headers: hdrs({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+      body: JSON.stringify(body)
+    });
+    checkAuth(res);
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0,200));
+  }
+  async function dbDelete(collection, ids){
+    if (!ids.length) return;
+    await ensureSession();
+    const list = '(' + ids.map(i => '"' + String(i).replace(/"/g,'') + '"').join(',') + ')';
+    const res = await fetch(REST + '?collection=eq.' + encodeURIComponent(collection) + '&id=in.' + encodeURIComponent(list), {
+      method: 'DELETE', headers: hdrs({ 'Prefer': 'return=minimal' })
+    });
+    checkAuth(res);
+    if (!res.ok) throw new Error(res.status + ' ' + (await res.text()).slice(0,200));
+  }
+
+  function snapshotOf(arr){
+    const m = {};
+    (arr || []).forEach(r => { if (r && r.id) m[r.id] = JSON.stringify(r); });
+    return m;
+  }
+
+  // Diffs the in-memory array against what we last knew was in the database,
+  // then writes only what actually changed. Every existing persistX() call
+  // site works unchanged.
+  async function sync(collection, arr){
+    if (!online) {
+      setConn(false, 'Not connected — nothing is being saved. Use backup/restore to keep your work.');
+      return;
+    }
+    const prev = snapshots[collection] || {};
+    const next = snapshotOf(arr);
+    const changed = (arr || []).filter(r => r && r.id && prev[r.id] !== next[r.id]);
+    const removed = Object.keys(prev).filter(id => !(id in next));
+    if (!changed.length && !removed.length) return;
+    inFlight++;
+    try {
+      await dbUpsert(collection, changed);
+      await dbDelete(collection, removed);
+      snapshots[collection] = next;   // only advance the snapshot on success
+      setConn(true);
+      hideBanner();
+    } catch(e) {
+      console.error('save failed', collection, e);
+      setConn(false, 'Last save failed: ' + e.message);
+      showBanner('<b>That change did not save.</b> ' + escapeHtml(e.message) +
+        '<br>It will retry on your next edit. Check your Supabase table policies if this keeps happening.');
+    } finally { inFlight--; }
+  }
+
+  const persistSignals   = () => sync('signals', signals);
+  const persistKnowledge = () => sync('knowledge', knowledge);
+  const persistDirectory = () => sync('directory', directory);
+  const persistPatterns  = () => sync('patterns', patterns);
+  const persistWins      = () => sync('wins', wins);
+
+  async function loadCollection(collection, seedFn){
+    const rows = await dbList(collection);
+    if (rows.length) { snapshots[collection] = snapshotOf(rows); return rows; }
+    const seed = seedFn();
+    if (seed.length) { await dbUpsert(collection, seed); snapshots[collection] = snapshotOf(seed); }
+    else snapshots[collection] = {};
+    return seed;
+  }
 
   async function loadAll(){
-    signals = await loadKey('signals', seedSignals);
-    knowledge = await loadKey('knowledge', seedKnowledge);
-    directory = await loadKey('directory', seedDirectory);
-    patterns = await loadKey('patterns', seedPatterns);
-    wins = await loadKey('wins', seedWins);
-    try { const me = await window.storage.get('myName', false); if (me && me.value) myName = me.value; } catch(e){}
+    if (!configured) {
+      online = false; loaded = true;
+      setConn(false, 'Supabase not configured');
+      showBanner('<b>Supabase isn\'t configured yet.</b> Open <code>index.html</code>, find the CONFIG block at the top of the &lt;script&gt; tag, and paste in your Project URL and anon public key from Supabase → Settings → API. Run <code>supabase-setup.sql</code> in the SQL Editor first if you haven\'t.');
+      directory = seedDirectory();
+      render();
+      return;
+    }
+    setConn(null);
+    try {
+      const [s, k, d, p, w] = await Promise.all([
+        loadCollection('signals', seedSignals),
+        loadCollection('knowledge', seedKnowledge),
+        loadCollection('directory', seedDirectory),
+        loadCollection('patterns', seedPatterns),
+        loadCollection('wins', seedWins)
+      ]);
+      signals = s; knowledge = k; directory = d; patterns = p; wins = w;
+      online = true; setConn(true); hideBanner();
+    } catch(e) {
+      online = false;
+      console.error('load failed', e);
+      setConn(false, e.message);
+      showBanner('<b>Couldn\'t reach Supabase.</b> ' + escapeHtml(e.message) +
+        '<br>Common causes: the <code>' + TABLE + '</code> table doesn\'t exist yet, row-level security is blocking the anon key, or the URL/key in the CONFIG block is wrong. <b>Nothing you type will be saved until this clears.</b>');
+      directory = seedDirectory();
+    }
+    try { myName = localStorage.getItem('careDeskName') || ''; } catch(e){}
     if (myName) ['pName','wName','iName','ptOwner'].forEach(id => { const el = document.getElementById(id); if (el) el.value = myName; });
     loaded = true;
     render();
   }
+
+  // Pull in what teammates have changed. Skips while a modal is open or a
+  // save is in flight so it can never yank data out from under an edit.
+  async function refresh(silent){
+    if (!online || inFlight > 0) return;
+    if (document.getElementById('slOverlay').classList.contains('show')) return;
+    if (!silent && document.hidden) return;
+    try {
+      const [s, k, d, p, w] = await Promise.all([
+        dbList('signals'), dbList('knowledge'), dbList('directory'), dbList('patterns'), dbList('wins')
+      ]);
+      const incoming = { signals:s, knowledge:k, directory:d, patterns:p, wins:w };
+      let dirty = false;
+      Object.keys(incoming).forEach(key => {
+        const snap = snapshotOf(incoming[key]);
+        if (JSON.stringify(snap) !== JSON.stringify(snapshots[key] || {})) { snapshots[key] = snap; dirty = true; }
+      });
+      if (dirty) {
+        signals = s; knowledge = k; directory = d; patterns = p; wins = w;
+        render();
+      }
+      setConn(true); hideBanner();
+    } catch(e) { console.error('refresh failed', e); }
+  }
+  setInterval(() => refresh(false), REFRESH_MS);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) refresh(false); });
+
   async function rememberName(name){
     if (!name || name === myName) return;
     myName = name;
-    try { await window.storage.set('myName', name, false); } catch(e){}
+    try { localStorage.setItem('careDeskName', name); } catch(e){}
   }
 
   /* ---------- RENDER ---------- */
@@ -906,6 +1248,12 @@
     render();
   }
   document.querySelectorAll('.sl-tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+  document.getElementById('slRefresh').addEventListener('click', async function(){
+    const el = this; const old = el.textContent;
+    el.textContent = 'refreshing…';
+    await refresh(true);
+    el.textContent = old;
+  });
 
   /* ---------- SIGNALS BOARD ---------- */
   function filteredSignals(){
@@ -1092,7 +1440,8 @@
   /* ---------- KNOWLEDGE ---------- */
   function renderDirectory(){
     const q = kbFilter.search.toLowerCase();
-    const rows = q ? directory.filter(d => d.department.toLowerCase().includes(q) || d.notes.toLowerCase().includes(q) || d.extension.toLowerCase().includes(q)) : directory;
+    const sorted = directory.slice().sort((a,b) => (a.sort==null?9999:a.sort) - (b.sort==null?9999:b.sort));
+    const rows = q ? sorted.filter(d => d.department.toLowerCase().includes(q) || d.notes.toLowerCase().includes(q) || d.extension.toLowerCase().includes(q)) : sorted;
     document.getElementById('directoryBody').innerHTML = rows.length ? rows.map(d => `
       <tr class="dir-row" data-dir="${d.id}">
         <td class="sl-dir-dept">${escapeHtml(d.department)}</td>
@@ -1274,7 +1623,7 @@
     confirmLink('mDelete', 'delete pattern', async () => {
       patterns = patterns.filter(x => x.id !== p.id);
       signals.filter(s => s.patternId === p.id).forEach(s => s.patternId = null);
-      await Promise.all([persistPatterns(), persistSignals()]); closeModal(); render();
+      await persistPatterns(); await persistSignals(); closeModal(); render();
     });
     document.getElementById('mSave').onclick = async () => {
       p.name = document.getElementById('mName').value.trim() || p.name;
@@ -1363,7 +1712,8 @@
 
   function directoryModal(){
     const isNew = !currentModal.id;
-    const d = isNew ? { id:uid(), department:'', extension:'', notes:'', updated:Date.now() } : directory.find(x=>x.id===currentModal.id);
+    const minSort = directory.length ? Math.min.apply(null, directory.map(x => x.sort==null?0:x.sort)) : 0;
+    const d = isNew ? { id:uid(), department:'', extension:'', notes:'', sort:minSort-1, updated:Date.now() } : directory.find(x=>x.id===currentModal.id);
     if (!d) return closeModal();
     modalEl.innerHTML = `
       <div class="sl-modal-top"><h2 class="sl-modal-title">${isNew?'Add directory entry':'Edit directory entry'}</h2>
@@ -1395,13 +1745,13 @@
     const dump = JSON.stringify({ signals, knowledge, directory, patterns, wins }, null, 2);
     modalEl.innerHTML = `
       <div class="sl-modal-top"><h2 class="sl-modal-title">Backup &amp; restore</h2><button class="sl-close" id="mClose">&times;</button></div>
-      <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px;">Copy this somewhere safe now and then. If anything disappears, paste a saved copy below to restore it.</div>
+      <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px;">Supabase keeps its own backups, but grabbing a copy of this now and then costs nothing. Pasting a saved copy below overwrites what's in Supabase for everyone.</div>
       <div class="sl-section-label">Current data</div>
       <textarea class="sl-modal-textarea sl-mono" id="mDump" style="min-height:140px; font-size:11.5px;" readonly>${escapeHtml(dump)}</textarea>
       <div style="text-align:right; margin-top:8px;"><button class="sl-btn sl-btn-ghost sl-btn-sm" id="mCopy">Copy to clipboard</button></div>
       <div class="sl-section-label">Restore from a backup</div>
       <textarea class="sl-modal-textarea sl-mono" id="mRestoreIn" placeholder="Paste saved backup text here" style="min-height:100px; font-size:11.5px;"></textarea>
-      <div class="sl-modal-footer-row"><span style="font-size:11.5px; color:var(--text-dim);">Restoring replaces everything currently here.</span>
+      <div class="sl-modal-footer-row"><span style="font-size:11.5px; color:var(--text-dim);">Restoring replaces everything, for the whole team.</span>
         <button class="sl-btn sl-btn-primary sl-btn-sm" id="mRestore">Restore this</button></div>`;
     document.getElementById('mClose').onclick = closeModal;
     document.getElementById('mCopy').onclick = async function(){
@@ -1425,11 +1775,35 @@
       if (Array.isArray(parsed.directory)) directory = parsed.directory;
       if (Array.isArray(parsed.patterns)) patterns = parsed.patterns;
       if (Array.isArray(parsed.wins)) wins = parsed.wins;
-      await Promise.all([persistSignals(), persistKnowledge(), persistDirectory(), persistPatterns(), persistWins()]);
+      await persistSignals(); await persistKnowledge(); await persistDirectory();
+      await persistPatterns(); await persistWins();
       closeModal(); render();
     };
   }
 
-  loadAll();
+  async function boot(){
+    // Not configured yet: show the app with the setup banner rather than a
+    // login box nobody can get past.
+    if (!configured) {
+      document.getElementById('slLogin').classList.remove('show');
+      document.getElementById('slRoot').style.display = '';
+      await loadAll();
+      return;
+    }
+    readStoredSession();
+    if (session && session.refresh_token) {
+      try {
+        await ensureSession(true);   // validates the stored token on load
+        showApp();
+        await loadAll();
+        return;
+      } catch(e) { writeSession(null); }
+    }
+    showLogin();
+  }
+
+  boot();
 })();
 </script>
+</body>
+</html>
