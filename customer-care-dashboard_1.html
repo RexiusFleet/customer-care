@@ -320,6 +320,41 @@ html, body { margin: 0; padding: 0; background: #12161d; }
 .sl-pin-toggle { font-size: 12px; color: var(--text-muted); cursor: pointer; user-select: none; }
 .sl-pin-toggle.active { color: var(--amber); }
 
+/* ---- CRM: call guide, leads, contacts ---- */
+.sl-tab-sep { width: 1px; background: var(--border); margin: 6px 6px; align-self: stretch; }
+.sl-guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.sl-guide-card { background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--blue); border-radius: 9px; padding: 14px 15px; display: flex; flex-direction: column; }
+.sl-guide-card.answer { border-left-color: var(--teal); }
+.sl-guide-card.lead { border-left-color: var(--amber); }
+.sl-guide-action { font-family: 'IBM Plex Mono'; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--blue); margin-bottom: 6px; }
+.sl-guide-card.answer .sl-guide-action { color: var(--teal); }
+.sl-guide-card.lead .sl-guide-action { color: var(--amber); }
+.sl-guide-dept { font-family: 'Space Grotesk'; font-weight: 700; font-size: 16px; line-height: 1.25; margin: 0 0 8px; }
+.sl-guide-who { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.sl-guide-who span { color: var(--text-muted); font-weight: 400; }
+.sl-guide-list { margin: 0 0 8px; padding-left: 18px; font-size: 13px; color: var(--text); line-height: 1.6; }
+.sl-guide-note { font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-top: 4px; flex: 1; }
+.sl-guide-card .sl-btn { margin-top: 12px; align-self: flex-start; }
+.sl-lead-board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; align-items: start; }
+.sl-queue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+.sl-queue { background: var(--panel); border: 1px dashed var(--amber-dim); border-radius: 10px; padding: 14px; }
+.sl-queue.alert { border-color: var(--coral); }
+.sl-queue .sl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sl-lead-contact { background: var(--card); border-radius: 8px; padding: 11px 13px; font-size: 13.5px; line-height: 1.7; margin-bottom: 14px; }
+.sl-lead-contact a { color: var(--amber); text-decoration: none; }
+.sl-lead-contact .lbl { font-family: 'IBM Plex Mono'; font-size: 10.5px; text-transform: uppercase; color: var(--text-dim); display: inline-block; width: 78px; }
+.sl-match { display: none; background: #2c3a2f; border: 1px solid var(--teal); border-radius: 7px; padding: 9px 12px; font-size: 12.5px; color: #cfe9dc; margin-top: 10px; }
+.sl-match.show { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.sl-match u { cursor: pointer; color: var(--teal); white-space: nowrap; }
+.sl-form-err { color: var(--coral); font-size: 12.5px; margin-top: 10px; min-height: 16px; }
+.sl-stage-chip { font-family: 'IBM Plex Mono'; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 4px; padding: 2px 6px; border: 1px solid var(--border); color: var(--text-muted); }
+.sl-stage-chip.won { color: var(--teal); border-color: var(--teal); }
+.sl-stage-chip.lost, .sl-stage-chip.wrong { color: var(--coral); border-color: var(--coral); }
+.sl-stage-chip.new, .sl-stage-chip.triage { color: var(--amber); border-color: var(--amber-dim); }
+@media (max-width: 1180px) { .sl-lead-board { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 980px) { .sl-guide-grid, .sl-lead-board { grid-template-columns: 1fr 1fr; } .sl-queue-grid { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .sl-guide-grid, .sl-lead-board, .sl-queue .sl-cards { grid-template-columns: 1fr; } }
+
 @media (max-width: 980px) {
   .sl-board, .sl-pattern-board { grid-template-columns: 1fr 1fr; }
   .sl-kb-grid, .sl-win-grid { grid-template-columns: 1fr 1fr; }
@@ -344,7 +379,7 @@ html, body { margin: 0; padding: 0; background: #12161d; }
 <div class="sl-login" id="slLogin">
   <form class="sl-login-card" id="slLoginForm" autocomplete="on">
     <div class="sl-wordmark"><span class="dot"></span><h1 class="sl-title">CARE DESK</h1></div>
-    <div class="sl-login-sub" id="slLoginSub">Sign in to see the team's signals, patterns and knowledge base.</div>
+    <div class="sl-login-sub" id="slLoginSub">Sign in to see the team's call guide, leads, signals and knowledge base.</div>
 
     <label class="sl-login-label" for="slEmail">Work email</label>
     <input class="sl-login-input" id="slEmail" type="email" autocomplete="username" required />
@@ -383,6 +418,10 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     <div class="sl-tab" data-tab="patterns">Patterns<span class="sl-tab-count" id="tabCountPatterns"></span></div>
     <div class="sl-tab" data-tab="wins">What Works<span class="sl-tab-count" id="tabCountWins"></span></div>
     <div class="sl-tab" data-tab="knowledge">Knowledge Base<span class="sl-tab-count" id="tabCountKnowledge"></span></div>
+    <span class="sl-tab-sep"></span>
+    <div class="sl-tab" data-tab="guide">☎ Call Guide</div>
+    <div class="sl-tab" data-tab="leads">Leads<span class="sl-tab-count" id="tabCountLeads"></span></div>
+    <div class="sl-tab" data-tab="contacts">Contacts<span class="sl-tab-count" id="tabCountContacts"></span></div>
     <span class="sl-archived-toggle" id="slRefresh" style="align-self:center; margin-left:auto;">refresh</span>
     <span class="sl-archived-toggle" id="openBackup" style="align-self:center; margin-left:14px;">backup / restore data</span>
   </div>
@@ -682,6 +721,46 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     <div class="sl-kb-grid" id="kbGrid"></div>
   </div>
 
+  <!-- ============ CALL GUIDE ============ -->
+  <div class="sl-panel" id="panelGuide">
+    <div class="sl-kb-section-sub" style="margin-bottom:16px;">What to do with a call, by department. Blue cards get transferred, green cards you answer yourself, amber cards you take the customer's details and pass the lead to the manager.</div>
+    <div class="sl-toolbar">
+      <input class="sl-search" id="gdSearch" placeholder="Search departments, people or topics..." />
+      <span class="sl-chip active" data-gtype="all">All</span>
+      <span class="sl-chip" data-gtype="transfer">Transfer</span>
+      <span class="sl-chip" data-gtype="answer">Answer</span>
+      <span class="sl-chip" data-gtype="lead">Take a lead</span>
+    </div>
+    <div class="sl-guide-grid" id="guideGrid"></div>
+  </div>
+
+  <!-- ============ LEADS ============ -->
+  <div class="sl-panel" id="panelLeads">
+    <div class="sl-kb-section-sub" style="margin-bottom:16px;">Every lead taken on a call or sent in from a website form. Managers move their leads left to right; anything marked Wrong Department comes back to the care team to re-route.</div>
+    <div class="sl-toolbar">
+      <input class="sl-search" id="ldSearch" placeholder="Search leads by name, phone, email or request..." />
+      <select class="sl-modal-select" id="ldView" style="width:auto; max-width:340px;"></select>
+      <button class="sl-btn sl-btn-primary sl-btn-sm" id="ldNew">+ New lead</button>
+      <span class="sl-archived-toggle" id="ldShowAll">show all closed</span>
+    </div>
+    <div class="sl-queue-grid" id="ldQueues"></div>
+    <div class="sl-lead-board" id="leadBoard"></div>
+  </div>
+
+  <!-- ============ CONTACTS ============ -->
+  <div class="sl-panel" id="panelContacts">
+    <div class="sl-kb-section-sub" style="margin-bottom:16px;">One record per customer, with every lead attached. Repeat callers are matched by phone number or email.</div>
+    <div class="sl-toolbar">
+      <input class="sl-search" id="ctSearch" placeholder="Search contacts..." />
+    </div>
+    <div class="sl-directory-wrap">
+      <table class="sl-directory-table">
+        <thead><tr><th style="width:26%">Name</th><th style="width:18%">Phone</th><th style="width:26%">Email</th><th>Leads</th></tr></thead>
+        <tbody id="contactsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="sl-overlay" id="slOverlay"><div class="sl-modal" id="slModal"></div></div>
 </div>
 
@@ -713,7 +792,7 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     { status:'established', title:'Established System', sub:'Documented and in place', cls:'sl-col-established' },
   ];
 
-  let signals = [], knowledge = [], directory = [], patterns = [], wins = [];
+  let signals = [], knowledge = [], directory = [], patterns = [], wins = [], contacts = [], leads = [];
   let activeTab = 'form', currentModal = null, myName = '', pendingLinkIds = [], loaded = false;
   let filter = { search:'', category:'all', showArchived:false };
   let kbFilter = { search:'', category:'all' };
@@ -993,6 +1072,8 @@ html, body { margin: 0; padding: 0; background: #12161d; }
   const persistDirectory = () => sync('directory', directory);
   const persistPatterns  = () => sync('patterns', patterns);
   const persistWins      = () => sync('wins', wins);
+  const persistContacts  = () => sync('contacts', contacts);
+  const persistLeads     = () => sync('leads', leads);
 
   async function loadCollection(collection, seedFn){
     const rows = await dbList(collection);
@@ -1014,14 +1095,17 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     }
     setConn(null);
     try {
-      const [s, k, d, p, w] = await Promise.all([
+      const none = () => [];
+      const [s, k, d, p, w, c, l] = await Promise.all([
         loadCollection('signals', seedSignals),
         loadCollection('knowledge', seedKnowledge),
         loadCollection('directory', seedDirectory),
         loadCollection('patterns', seedPatterns),
-        loadCollection('wins', seedWins)
+        loadCollection('wins', seedWins),
+        loadCollection('contacts', none),
+        loadCollection('leads', none)
       ]);
-      signals = s; knowledge = k; directory = d; patterns = p; wins = w;
+      signals = s; knowledge = k; directory = d; patterns = p; wins = w; contacts = c; leads = l;
       online = true; setConn(true); hideBanner();
     } catch(e) {
       online = false;
@@ -1044,17 +1128,18 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     if (document.getElementById('slOverlay').classList.contains('show')) return;
     if (!silent && document.hidden) return;
     try {
-      const [s, k, d, p, w] = await Promise.all([
-        dbList('signals'), dbList('knowledge'), dbList('directory'), dbList('patterns'), dbList('wins')
+      const [s, k, d, p, w, c, l] = await Promise.all([
+        dbList('signals'), dbList('knowledge'), dbList('directory'), dbList('patterns'), dbList('wins'),
+        dbList('contacts'), dbList('leads')
       ]);
-      const incoming = { signals:s, knowledge:k, directory:d, patterns:p, wins:w };
+      const incoming = { signals:s, knowledge:k, directory:d, patterns:p, wins:w, contacts:c, leads:l };
       let dirty = false;
       Object.keys(incoming).forEach(key => {
         const snap = snapshotOf(incoming[key]);
         if (JSON.stringify(snap) !== JSON.stringify(snapshots[key] || {})) { snapshots[key] = snap; dirty = true; }
       });
       if (dirty) {
-        signals = s; knowledge = k; directory = d; patterns = p; wins = w;
+        signals = s; knowledge = k; directory = d; patterns = p; wins = w; contacts = c; leads = l;
         render();
       }
       setConn(true); hideBanner();
@@ -1078,6 +1163,9 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     else if (activeTab === 'patterns') { renderInsights(); renderSuggestions(); renderPatternBoard(); }
     else if (activeTab === 'wins') renderWins();
     else if (activeTab === 'knowledge') { renderDirectory(); renderKnowledgeGrid(); }
+    else if (activeTab === 'guide') renderGuide();
+    else if (activeTab === 'leads') renderLeads();
+    else if (activeTab === 'contacts') renderContacts();
   }
   function renderStats(){
     const el = document.getElementById('slStats');
@@ -1104,6 +1192,14 @@ html, body { margin: 0; padding: 0; background: #12161d; }
       el.innerHTML = `<div class="sl-stat"><div class="sl-stat-num amber">${knowledge.length}</div><div class="sl-stat-label">Resources</div></div>
         <div class="sl-stat"><div class="sl-stat-num blue">${directory.length}</div><div class="sl-stat-label">Directory</div></div>
         <div class="sl-stat"><div class="sl-stat-num teal">${week}</div><div class="sl-stat-label">Updated (7d)</div></div>`;
+    } else if (activeTab === 'guide' || activeTab === 'leads' || activeTab === 'contacts') {
+      const scope = (activeTab === 'leads' && ldFilter.view !== 'all') ? leads.filter(l => l.department === ldFilter.view) : leads;
+      const open = scope.filter(isOpenLead).length;
+      const rep = leads.filter(needsRep).length;
+      const won = scope.filter(l => l.stage === 'won' && (l.closedAt || l.updated) >= monthAgo).length;
+      el.innerHTML = `<div class="sl-stat"><div class="sl-stat-num amber">${open}</div><div class="sl-stat-label">Open leads</div></div>
+        <div class="sl-stat"><div class="sl-stat-num ${rep ? 'purple' : ''}">${rep}</div><div class="sl-stat-label">Need care team</div></div>
+        <div class="sl-stat"><div class="sl-stat-num teal">${won}</div><div class="sl-stat-label">Won (30d)</div></div>`;
     } else {
       const open = signals.filter(s => s.status==='new'||s.status==='reviewing').length;
       el.innerHTML = `<div class="sl-stat"><div class="sl-stat-num amber">${open}</div><div class="sl-stat-label">Open signals</div></div>
@@ -1116,6 +1212,9 @@ html, body { margin: 0; padding: 0; background: #12161d; }
     document.getElementById('tabCountPatterns').textContent = patterns.length;
     document.getElementById('tabCountWins').textContent = wins.length;
     document.getElementById('tabCountKnowledge').textContent = knowledge.length;
+    const repQ = leads.filter(needsRep).length;
+    document.getElementById('tabCountLeads').textContent = leads.filter(isOpenLead).length + (repQ ? ' · ' + repQ + ' to route' : '');
+    document.getElementById('tabCountContacts').textContent = contacts.length;
   }
 
   /* ---------- INTAKE FORM ---------- */
@@ -1243,7 +1342,7 @@ html, body { margin: 0; padding: 0; background: #12161d; }
   function switchTab(tab){
     activeTab = tab;
     document.querySelectorAll('.sl-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-    [['form','panelForm'],['signals','panelSignals'],['patterns','panelPatterns'],['wins','panelWins'],['knowledge','panelKnowledge']]
+    [['form','panelForm'],['signals','panelSignals'],['patterns','panelPatterns'],['wins','panelWins'],['knowledge','panelKnowledge'],['guide','panelGuide'],['leads','panelLeads'],['contacts','panelContacts']]
       .forEach(([k,id]) => document.getElementById(id).classList.toggle('active', k === tab));
     render();
   }
@@ -1496,7 +1595,7 @@ html, body { margin: 0; padding: 0; background: #12161d; }
   }
   function renderModal(){
     if (!currentModal) return;
-    ({ signal: signalModal, pattern: patternModal, win: winModal, article: articleModal, directory: directoryModal, backup: backupModal })[currentModal.type]();
+    ({ signal: signalModal, pattern: patternModal, win: winModal, article: articleModal, directory: directoryModal, backup: backupModal, lead: leadModal, newLead: newLeadModal, contact: contactModal })[currentModal.type]();
   }
 
   function signalModal(){
@@ -1742,7 +1841,7 @@ html, body { margin: 0; padding: 0; background: #12161d; }
   }
 
   function backupModal(){
-    const dump = JSON.stringify({ signals, knowledge, directory, patterns, wins }, null, 2);
+    const dump = JSON.stringify({ signals, knowledge, directory, patterns, wins, contacts, leads }, null, 2);
     modalEl.innerHTML = `
       <div class="sl-modal-top"><h2 class="sl-modal-title">Backup &amp; restore</h2><button class="sl-close" id="mClose">&times;</button></div>
       <div style="font-size:12.5px; color:var(--text-muted); margin-bottom:14px;">Supabase keeps its own backups, but grabbing a copy of this now and then costs nothing. Pasting a saved copy below overwrites what's in Supabase for everyone.</div>
@@ -1775,9 +1874,411 @@ html, body { margin: 0; padding: 0; background: #12161d; }
       if (Array.isArray(parsed.directory)) directory = parsed.directory;
       if (Array.isArray(parsed.patterns)) patterns = parsed.patterns;
       if (Array.isArray(parsed.wins)) wins = parsed.wins;
+      if (Array.isArray(parsed.contacts)) contacts = parsed.contacts;
+      if (Array.isArray(parsed.leads)) leads = parsed.leads;
       await persistSignals(); await persistKnowledge(); await persistDirectory();
       await persistPatterns(); await persistWins();
+      await persistContacts(); await persistLeads();
       closeModal(); render();
+    };
+  }
+
+
+  /* ======================================================================
+     CRM — CALL GUIDE, LEADS, CONTACTS
+     Stored in the same care_desk table as two more collections:
+     'contacts' (one per customer) and 'leads' (one per request).
+     To change who handles what, edit LEAD_DEPTS and CALL_GUIDE below.
+     ====================================================================== */
+  const LEAD_DEPTS = [
+    { key:'res-maint', name:'Residential Maintenance', short:'Res Maint', managers:['Jason Spies'] },
+    { key:'com-maint', name:'Commercial Maintenance', short:'Com Maint', managers:['Coral Bredding'] },
+    { key:'outdoor',   name:'Residential Construction / Outdoor Living', short:'Outdoor Living', managers:['Gabe Cryns','Renee Thayer'] }
+  ];
+  const CALL_GUIDE = [
+    { type:'transfer', dept:'Eugene Blowers', to:['Mollie Smith','Ian Wheeler'] },
+    { type:'answer', dept:'Retail Yard',
+      topics:['Product availability','Pricing','Hours','Accepting materials for yard debris'] },
+    { type:'answer', dept:'Bulk Delivery',
+      topics:['Pricing','Scheduling a delivery','Schedule availability','Volume capacity by truck','Product questions'],
+      to:['Kevin Roemer'], note:'Transfer to Kevin when the request is intricate or the customer is a wholesale-volume customer.' },
+    { type:'transfer', dept:'Western Mobile Storage', to:['Joey Moore'] },
+    { type:'transfer', dept:'Flatbed', to:['Nate Lee'] },
+    { type:'transfer', dept:'Portland Blowers', to:['Calvin Mariani','Cayden Lahmann'] },
+    { type:'transfer', dept:'Landscape Commercial Construction', to:['Mark Anderson'] },
+    { type:'transfer', dept:'Commercial & Residential Irrigation', to:['Irrigation Team'], note:'Extension to be added.' },
+    { type:'lead', dept:'Residential Maintenance', leadDept:'res-maint' },
+    { type:'lead', dept:'Commercial Maintenance', leadDept:'com-maint' },
+    { type:'lead', dept:'Residential Construction / Outdoor Living', leadDept:'outdoor' }
+  ];
+  const LEAD_COLUMNS = [
+    { k:'new',       l:'New',              sub:'Passed to the manager, not yet contacted', cls:'sl-col-new' },
+    { k:'contacted', l:'Contacted',        sub:'Manager has reached the customer',         cls:'sl-col-reviewing' },
+    { k:'quoted',    l:'Bid / Quote Sent', sub:'Waiting on the customer',                  cls:'sl-col-progress' },
+    { k:'won',       l:'Won',              sub:'Closed in the last 30 days',               cls:'sl-col-resolved' },
+    { k:'lost',      l:'Lost',             sub:'Closed in the last 30 days',               cls:'sl-col-identified' }
+  ];
+  const STAGE_LABEL = { triage:'Web inbox', 'new':'New', contacted:'Contacted', quoted:'Bid / Quote Sent', won:'Won', lost:'Lost', wrong:'Wrong Department', closed:'Closed by care rep' };
+  const LEAD_SOURCES = ['Phone call','Website form','Walk-in','Other'];
+
+  let gdFilter = { search:'', type:'all' };
+  let ldFilter = { search:'', view:'all', showAll:false };
+  let ctFilter = { search:'' };
+  try { ldFilter.view = localStorage.getItem('careDeskLeadView') || 'all'; } catch(e){}
+
+  function escAttr(s){ return escapeHtml(s).replace(/"/g,'&quot;'); }
+  function deptOf(key){ return LEAD_DEPTS.find(d => d.key === key) || null; }
+  function contactOf(l){ return contacts.find(c => c.id === l.contactId) || null; }
+  function normPhone(p){ const d = String(p||'').replace(/\D/g,''); return d.length >= 10 ? d.slice(-10) : d; }
+  function fmtPhone(p){ const d = normPhone(p); return d.length === 10 ? '(' + d.slice(0,3) + ') ' + d.slice(3,6) + '-' + d.slice(6) : (p || ''); }
+  function findContactMatch(phone, email){
+    const ph = normPhone(phone), em = String(email||'').trim().toLowerCase();
+    if (ph.length < 7 && !em) return null;
+    return contacts.find(c => (ph.length >= 7 && normPhone(c.phone) === ph) || (em && String(c.email||'').toLowerCase() === em)) || null;
+  }
+  function leadsFor(contactId){ return leads.filter(l => l.contactId === contactId).sort((a,b) => b.created - a.created); }
+  function isOpenLead(l){ return l.stage === 'new' || l.stage === 'contacted' || l.stage === 'quoted'; }
+  function needsRep(l){ return l.stage === 'triage' || l.stage === 'wrong'; }
+  function moveLead(l, to, note, author, deptKey){
+    l.history = l.history || [];
+    l.history.push({ date:Date.now(), author:author || 'Unknown', from:l.stage, to:to, note:note || '', dept:deptKey || '' });
+    l.stage = to;
+    if (deptKey) l.department = deptKey;
+    l.updated = Date.now();
+    l.closedAt = (to === 'won' || to === 'lost' || to === 'closed') ? Date.now() : null;
+    // Email alerts to managers will hook in here once the sending function exists.
+  }
+
+  /* ---------- CALL GUIDE ---------- */
+  function renderGuide(){
+    const q = gdFilter.search.toLowerCase();
+    const items = CALL_GUIDE.filter(g => {
+      if (gdFilter.type !== 'all' && g.type !== gdFilter.type) return false;
+      if (!q) return true;
+      const d = g.leadDept ? deptOf(g.leadDept) : null;
+      const hay = [g.dept, (g.to||[]).join(' '), (g.topics||[]).join(' '), g.note||'', d ? d.managers.join(' ') : ''].join(' ').toLowerCase();
+      return hay.includes(q);
+    });
+    document.getElementById('guideGrid').innerHTML = items.length ? items.map(g => {
+      if (g.type === 'lead') {
+        const d = deptOf(g.leadDept);
+        const open = leads.filter(l => l.department === d.key && isOpenLead(l)).length;
+        return `<div class="sl-guide-card lead">
+          <div class="sl-guide-action">Take a lead</div>
+          <h3 class="sl-guide-dept">${escapeHtml(g.dept)}</h3>
+          <div class="sl-guide-who"><span>Goes to</span> ${escapeHtml(d.managers.join(' & '))}</div>
+          <div class="sl-guide-note">Take down the customer's details and what they need. It lands in the manager's queue. ${open} open right now.</div>
+          <button class="sl-btn sl-btn-primary sl-btn-sm" data-newlead="${d.key}">+ Take a lead</button>
+        </div>`;
+      }
+      const who = g.to ? `<div class="sl-guide-who"><span>${g.type === 'answer' ? 'Escalate to' : 'Transfer to'}</span> ${escapeHtml(g.to.join(' or '))}</div>` : '';
+      return `<div class="sl-guide-card ${g.type}">
+        <div class="sl-guide-action">${g.type === 'answer' ? 'Answer it yourself' : 'Transfer'}</div>
+        <h3 class="sl-guide-dept">${escapeHtml(g.dept)}</h3>
+        ${g.topics ? '<ul class="sl-guide-list">' + g.topics.map(t => '<li>' + escapeHtml(t) + '</li>').join('') + '</ul>' : ''}
+        ${who}
+        ${g.note ? '<div class="sl-guide-note">' + escapeHtml(g.note) + '</div>' : ''}
+      </div>`;
+    }).join('') : '<div class="sl-empty">No matching departments</div>';
+  }
+  document.getElementById('gdSearch').addEventListener('input', e => { gdFilter.search = e.target.value; renderGuide(); });
+  document.querySelectorAll('#panelGuide .sl-chip[data-gtype]').forEach(c => c.addEventListener('click', function(){
+    document.querySelectorAll('#panelGuide .sl-chip[data-gtype]').forEach(x => x.classList.remove('active'));
+    c.classList.add('active'); gdFilter.type = c.dataset.gtype; renderGuide();
+  }));
+  document.getElementById('guideGrid').addEventListener('click', e => {
+    const b = e.target.closest('[data-newlead]'); if (b) openNewLead({ dept: b.dataset.newlead });
+  });
+
+  /* ---------- LEADS ---------- */
+  function leadMatches(l){
+    if (!ldFilter.search) return true;
+    const q = ldFilter.search.toLowerCase(), c = contactOf(l) || {};
+    const qd = q.replace(/\D/g,'');
+    return [c.name, c.email, c.address, l.request, l.formName].some(v => String(v||'').toLowerCase().includes(q)) ||
+      (qd.length >= 3 && normPhone(c.phone).includes(qd));
+  }
+  function leadCard(l){
+    const c = contactOf(l) || {}, d = deptOf(l.department);
+    const waiting = l.stage === 'new' && (Date.now() - l.updated) > 2*86400000;
+    return `<div class="sl-card" data-lead="${l.id}">
+      <div class="sl-card-top"><span class="sl-cat-chip">${escapeHtml(d ? d.short : 'Unassigned')}</span><span class="sl-journey-tag">${escapeHtml(l.source || '')}</span></div>
+      <h3 class="sl-card-title">${escapeHtml(c.name || 'Unknown contact')}</h3>
+      <p class="sl-card-desc">${escapeHtml(l.request)}</p>
+      <div class="sl-card-footer"><span class="sl-reporter">${escapeHtml(fmtPhone(c.phone) || c.email || '')}</span>
+        <span class="sl-reporter">${relTime(l.updated)}${waiting ? '<span class="sl-stale">waiting</span>' : ''}</span></div>
+    </div>`;
+  }
+  function renderLeads(){
+    const sel = document.getElementById('ldView');
+    sel.innerHTML = '<option value="all">Everyone — all departments</option>' +
+      LEAD_DEPTS.map(d => `<option value="${d.key}">${escapeHtml(d.managers.join(' & '))} — ${escapeHtml(d.name)}</option>`).join('');
+    sel.value = deptOf(ldFilter.view) ? ldFilter.view : 'all';
+    const list = leads.filter(leadMatches);
+
+    const queues = [
+      { stage:'triage', title:'Website form inbox', sub:'New form leads. Assign each to a manager or handle it yourself.', cls:'' },
+      { stage:'wrong',  title:'Needs re-routing',   sub:'A manager marked these Wrong Department. Get them to the right place.', cls:'alert' }
+    ];
+    document.getElementById('ldQueues').innerHTML = ldFilter.view !== 'all' ? '' : queues.map(qu => {
+      const items = list.filter(l => l.stage === qu.stage).sort((a,b) => a.updated - b.updated);
+      return `<div class="sl-queue ${items.length ? qu.cls : ''}">
+        <div class="sl-col-head"><div class="sl-col-title-row"><span class="sl-col-title">${qu.title}</span><span class="sl-col-count">${items.length}</span></div>
+          <div class="sl-col-sub">${qu.sub}</div></div>
+        <div class="sl-cards">${items.length ? items.map(leadCard).join('') : '<div class="sl-empty" style="grid-column:1/-1;">Nothing waiting</div>'}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('ldQueues').style.display = ldFilter.view === 'all' ? '' : 'none';
+
+    const monthAgo = Date.now() - 30*86400000;
+    const mine = list.filter(l => ldFilter.view === 'all' || l.department === ldFilter.view);
+    document.getElementById('leadBoard').innerHTML = LEAD_COLUMNS.map(col => {
+      const closedCol = col.k === 'won' || col.k === 'lost';
+      const items = mine.filter(l => l.stage === col.k && (!closedCol || ldFilter.showAll || (l.closedAt || l.updated) >= monthAgo))
+        .sort((a,b) => closedCol ? b.updated - a.updated : a.updated - b.updated);
+      return `<div class="sl-column ${col.cls}">
+        <div class="sl-col-head"><div class="sl-col-title-row"><span class="sl-col-title">${col.l}</span><span class="sl-col-count">${items.length}</span></div>
+          <div class="sl-col-sub">${closedCol && ldFilter.showAll ? 'All time' : col.sub}</div><div class="sl-col-bar"></div></div>
+        <div class="sl-cards">${items.length ? items.map(leadCard).join('') : '<div class="sl-empty">Nothing here</div>'}</div>
+      </div>`;
+    }).join('');
+    document.getElementById('ldShowAll').textContent = ldFilter.showAll ? 'show last 30 days only' : 'show all closed';
+  }
+  document.getElementById('ldSearch').addEventListener('input', e => { ldFilter.search = e.target.value; renderLeads(); });
+  document.getElementById('ldView').addEventListener('change', e => {
+    ldFilter.view = e.target.value;
+    try { localStorage.setItem('careDeskLeadView', ldFilter.view); } catch(err){}
+    render();
+  });
+  document.getElementById('ldShowAll').addEventListener('click', () => { ldFilter.showAll = !ldFilter.showAll; renderLeads(); });
+  document.getElementById('ldNew').addEventListener('click', () => openNewLead({}));
+  document.getElementById('panelLeads').addEventListener('click', e => {
+    const card = e.target.closest('[data-lead]'); if (card) openModal('lead', card.dataset.lead);
+  });
+
+  /* ---------- CONTACTS ---------- */
+  function renderContacts(){
+    const q = ctFilter.search.toLowerCase(), qd = q.replace(/\D/g,'');
+    const rows = contacts.filter(c => !q ||
+      [c.name, c.email, c.address].some(v => String(v||'').toLowerCase().includes(q)) ||
+      (qd.length >= 3 && normPhone(c.phone).includes(qd))
+    ).sort((a,b) => String(a.name||'').localeCompare(String(b.name||'')));
+    document.getElementById('contactsBody').innerHTML = rows.length ? rows.map(c => {
+      const ls = leadsFor(c.id), open = ls.filter(l => isOpenLead(l) || needsRep(l)).length;
+      return `<tr class="dir-row" data-contact="${c.id}">
+        <td class="sl-dir-dept">${escapeHtml(c.name)}</td>
+        <td class="sl-dir-ext">${escapeHtml(fmtPhone(c.phone))}</td>
+        <td class="sl-dir-notes">${escapeHtml(c.email)}</td>
+        <td class="sl-dir-notes">${ls.length} total${open ? ' · ' + open + ' open' : ''}${ls.length ? ' · last ' + relTime(ls[0].created) : ''}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" class="sl-empty">' + (contacts.length ? 'No matching contacts' : 'No contacts yet — they are created when a lead is taken.') + '</td></tr>';
+  }
+  document.getElementById('ctSearch').addEventListener('input', e => { ctFilter.search = e.target.value; renderContacts(); });
+  document.getElementById('contactsBody').addEventListener('click', e => {
+    const row = e.target.closest('[data-contact]'); if (row) openModal('contact', row.dataset.contact);
+  });
+
+  /* ---------- CRM MODALS ---------- */
+  function openNewLead(opts){
+    currentModal = { type:'newLead', id:null, dept:opts.dept || '', contactId:opts.contactId || null };
+    renderModal(); overlay.classList.add('show');
+  }
+  function deptOptions(selected, withTriage){
+    return (withTriage ? '<option value="">Not sure yet — send to the triage inbox</option>' : '') +
+      LEAD_DEPTS.map(d => `<option value="${d.key}" ${selected === d.key ? 'selected' : ''}>${escapeHtml(d.name)} — ${escapeHtml(d.managers.join(' & '))}</option>`).join('');
+  }
+
+  function newLeadModal(){
+    const pre = currentModal.contactId ? contacts.find(c => c.id === currentModal.contactId) : null;
+    modalEl.innerHTML = `
+      <div class="sl-modal-top"><h2 class="sl-modal-title">New lead</h2><button class="sl-close" id="mClose">&times;</button></div>
+      <div class="sl-field-pair" style="margin-top:0;">
+        <div><div class="sl-section-label" style="margin-top:0;">Phone</div><input class="sl-modal-input" id="nlPhone" type="tel" value="${escAttr(pre ? pre.phone : '')}" placeholder="541-555-0123" /></div>
+        <div><div class="sl-section-label" style="margin-top:0;">Email</div><input class="sl-modal-input" id="nlEmail" type="email" value="${escAttr(pre ? pre.email : '')}" /></div>
+      </div>
+      <div class="sl-match" id="nlMatch"></div>
+      <div class="sl-section-label">Customer name</div>
+      <input class="sl-modal-input" id="nlName" value="${escAttr(pre ? pre.name : '')}" />
+      <div class="sl-section-label">Service address</div>
+      <input class="sl-modal-input" id="nlAddress" value="${escAttr(pre ? pre.address : '')}" placeholder="Where the work would be done" />
+      <div class="sl-field-pair">
+        <div><div class="sl-section-label">Department</div><select class="sl-modal-select" id="nlDept">${deptOptions(currentModal.dept, true)}</select></div>
+        <div><div class="sl-section-label">Preferred contact method</div><select class="sl-modal-select" id="nlPref"><option>Phone</option><option>Text</option><option>Email</option></select></div>
+      </div>
+      <div class="sl-section-label">What do they need?</div>
+      <textarea class="sl-modal-textarea" id="nlRequest" style="min-height:90px;" placeholder="The request in the customer's words, plus anything the manager should know before calling back."></textarea>
+      <div class="sl-field-pair">
+        <div><div class="sl-section-label">Source</div><select class="sl-modal-select" id="nlSource">${LEAD_SOURCES.map(s => '<option>' + s + '</option>').join('')}</select></div>
+        <div><div class="sl-section-label">Taken by</div><input class="sl-modal-input" id="nlBy" value="${escAttr(myName)}" placeholder="Your name" /></div>
+      </div>
+      <div class="sl-form-err" id="nlErr"></div>
+      <div class="sl-modal-footer-row"><span style="font-size:11.5px; color:var(--text-dim);">Saved to the manager's queue right away.</span>
+        <button class="sl-btn sl-btn-primary sl-btn-sm" id="nlSave">Save lead</button></div>`;
+    const $ = id => document.getElementById(id);
+    $('mClose').onclick = closeModal;
+    function checkMatch(){
+      const box = $('nlMatch');
+      const m = currentModal.contactId ? null : findContactMatch($('nlPhone').value, $('nlEmail').value);
+      if (!m) { box.classList.remove('show'); return; }
+      const n = leadsFor(m.id).length;
+      box.innerHTML = `<span>Existing customer: <b>${escapeHtml(m.name)}</b> · ${n} earlier lead${n === 1 ? '' : 's'}</span><u id="nlUse">use this contact</u>`;
+      box.classList.add('show');
+      $('nlUse').onclick = () => {
+        currentModal.contactId = m.id;
+        $('nlName').value = m.name || ''; $('nlAddress').value = m.address || $('nlAddress').value;
+        if (m.phone) $('nlPhone').value = m.phone;
+        if (m.email) $('nlEmail').value = m.email;
+        box.innerHTML = `<span>Adding this lead to <b>${escapeHtml(m.name)}</b>'s record.</span>`;
+      };
+    }
+    $('nlPhone').addEventListener('input', checkMatch);
+    $('nlEmail').addEventListener('input', checkMatch);
+    if (pre) { $('nlMatch').innerHTML = `<span>Adding this lead to <b>${escapeHtml(pre.name)}</b>'s record.</span>`; $('nlMatch').classList.add('show'); }
+    setTimeout(() => { const el = $(pre ? 'nlRequest' : 'nlPhone'); if (el) el.focus(); }, 60);
+
+    $('nlSave').onclick = async () => {
+      const v = id => $(id).value.trim();
+      const err = $('nlErr');
+      if (!v('nlName')) { err.textContent = 'Add the customer\'s name.'; $('nlName').focus(); return; }
+      if (!v('nlPhone') && !v('nlEmail')) { err.textContent = 'Add a phone number or an email so the manager can reach them.'; $('nlPhone').focus(); return; }
+      if (!v('nlRequest')) { err.textContent = 'Add what the customer needs.'; $('nlRequest').focus(); return; }
+      const now = Date.now(), by = v('nlBy') || 'Unknown';
+      let c = (currentModal.contactId && contacts.find(x => x.id === currentModal.contactId)) || findContactMatch(v('nlPhone'), v('nlEmail'));
+      if (c) {
+        c.name = v('nlName') || c.name; c.phone = v('nlPhone') || c.phone; c.email = v('nlEmail') || c.email;
+        c.address = v('nlAddress') || c.address; c.updated = now;
+      } else {
+        c = { id:uid(), name:v('nlName'), phone:v('nlPhone'), email:v('nlEmail'), address:v('nlAddress'), notes:'', created:now, updated:now };
+        contacts.push(c);
+      }
+      const deptKey = v('nlDept');
+      const l = { id:uid(), contactId:c.id, department:deptKey, stage: deptKey ? 'new' : 'triage', source:v('nlSource'),
+        request:v('nlRequest'), preferredContact:v('nlPref'), address:v('nlAddress'), takenBy:by, created:now, updated:now, closedAt:null,
+        history:[{ date:now, author:by, from:'', to: deptKey ? 'new' : 'triage', note:'Lead taken', dept:deptKey }] };
+      leads.push(l);
+      await rememberName(v('nlBy'));
+      await persistContacts(); await persistLeads();
+      closeModal(); switchTab('leads');
+    };
+  }
+
+  function leadModal(){
+    const l = leads.find(x => x.id === currentModal.id);
+    if (!l) return closeModal();
+    const c = contactOf(l) || {}, d = deptOf(l.department);
+    const routing = l.stage === 'triage' || l.stage === 'wrong' || l.stage === 'closed';
+    const stages = ['new','contacted','quoted','won','lost','wrong'];
+    const hist = (l.history || []).slice().reverse();
+    modalEl.innerHTML = `
+      <div class="sl-modal-top"><div style="flex:1">
+        <h2 class="sl-modal-title">${escapeHtml(c.name || 'Unknown contact')}</h2>
+        <div class="sl-modal-meta"><span class="sl-stage-chip ${l.stage}">${STAGE_LABEL[l.stage] || l.stage}</span>
+          <span class="sl-cat-chip">${escapeHtml(d ? d.name : 'No department yet')}</span><span class="sl-cat-chip">${escapeHtml(l.source || '')}</span></div>
+      </div><button class="sl-close" id="mClose">&times;</button></div>
+      <div class="sl-lead-contact">
+        ${c.phone ? `<div><span class="lbl">Phone</span><a href="tel:${escAttr(normPhone(c.phone))}">${escapeHtml(fmtPhone(c.phone))}</a></div>` : ''}
+        ${c.email ? `<div><span class="lbl">Email</span><a href="mailto:${escAttr(c.email)}">${escapeHtml(c.email)}</a></div>` : ''}
+        ${(l.address || c.address) ? `<div><span class="lbl">Address</span>${escapeHtml(l.address || c.address)}</div>` : ''}
+        <div><span class="lbl">Prefers</span>${escapeHtml(l.preferredContact || 'Phone')}</div>
+        ${d ? `<div><span class="lbl">Manager</span>${escapeHtml(d.managers.join(' & '))}</div>` : ''}
+        <div style="margin-top:4px;"><span class="sl-danger-link" id="mOpenContact">open contact record</span></div>
+      </div>
+      <div class="sl-section-label" style="margin-top:0;">Request</div>
+      <div class="sl-modal-desc">${escapeHtml(l.request)}</div>
+      <div style="font-size:11.5px; color:var(--text-dim);">Taken by ${escapeHtml(l.takenBy || 'Unknown')} · ${relTime(l.created)}${l.formName ? ' · form: ' + escapeHtml(l.formName) : ''}</div>
+      ${routing ? `
+        <div class="sl-section-label">Care team: route this lead</div>
+        <select class="sl-modal-select" id="mRouteDept">${deptOptions(l.stage === 'wrong' ? '' : l.department, false)}</select>
+      ` : `
+        <div class="sl-section-label">Stage</div>
+        <div class="sl-status-row">${stages.map(k => `<button class="sl-status-btn ${l.stage === k ? 'current' : ''}" data-stage="${k}">${STAGE_LABEL[k]}</button>`).join('')}</div>
+      `}
+      <div class="sl-section-label">Note</div>
+      <textarea class="sl-modal-textarea" id="mNote" placeholder="${routing ? 'What you did, or why it is going to this department.' : 'What happened? Required when marking Wrong Department.'}"></textarea>
+      <input class="sl-modal-input" id="mNoteBy" placeholder="Your name" value="${escAttr(myName)}" style="margin-top:8px; max-width:220px;" />
+      <div class="sl-form-err" id="mErr"></div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+        ${routing
+          ? (l.stage !== 'closed' ? '<button class="sl-btn sl-btn-ghost sl-btn-sm" id="mCloseOut">Close out — handled by care team</button>' : '') +
+            '<button class="sl-btn sl-btn-primary sl-btn-sm" id="mAssign">Assign to manager</button>'
+          : '<button class="sl-btn sl-btn-primary sl-btn-sm" id="mSave">Save update</button>'}
+      </div>
+      <div class="sl-section-label">History (${hist.length})</div>
+      <div class="sl-comments">${hist.map(h => `<div class="sl-comment">
+        <div class="sl-comment-meta">${escapeHtml(h.author)} · ${relTime(h.date)} · ${h.from && h.from !== h.to ? escapeHtml(STAGE_LABEL[h.from] || h.from) + ' → ' : ''}${escapeHtml(STAGE_LABEL[h.to] || h.to)}${h.dept && deptOf(h.dept) ? ' · ' + escapeHtml(deptOf(h.dept).short) : ''}</div>
+        ${h.note ? '<div class="sl-comment-text">' + escapeHtml(h.note) + '</div>' : ''}</div>`).join('')}</div>
+      <div class="sl-modal-footer-row"><span class="sl-danger-link" id="mDelete">delete lead permanently</span><span></span></div>`;
+    const $ = id => document.getElementById(id);
+    $('mClose').onclick = closeModal;
+    $('mOpenContact').onclick = () => { if (c.id) openModal('contact', c.id); };
+    const note = () => $('mNote').value.trim();
+    const by = () => $('mNoteBy').value.trim() || 'Unknown';
+    const done = async () => { await rememberName($('mNoteBy').value.trim()); await persistLeads(); closeModal(); render(); };
+    let pending = null;
+    modalEl.querySelectorAll('.sl-status-btn[data-stage]').forEach(b => b.onclick = () => {
+      pending = b.dataset.stage;
+      modalEl.querySelectorAll('.sl-status-btn[data-stage]').forEach(x => x.classList.toggle('current', x === b));
+      $('mErr').textContent = '';
+    });
+    if ($('mSave')) $('mSave').onclick = async () => {
+      const to = pending || l.stage;
+      if (to === l.stage && !note()) { $('mErr').textContent = 'Pick a new stage or add a note.'; return; }
+      if (to === 'wrong' && l.stage !== 'wrong' && !note()) { $('mErr').textContent = 'Add a note saying where this should go, so the care team can re-route it.'; $('mNote').focus(); return; }
+      moveLead(l, to, note(), by());
+      await done();
+    };
+    if ($('mAssign')) $('mAssign').onclick = async () => {
+      const key = $('mRouteDept').value;
+      if (!key) { $('mErr').textContent = 'Choose a department.'; return; }
+      if (l.stage === 'wrong' && key === l.department && !note()) { $('mErr').textContent = 'That is the department that sent it back. Add a note explaining why it belongs there.'; return; }
+      moveLead(l, 'new', note() || 'Assigned to ' + deptOf(key).name, by(), key);
+      await done();
+    };
+    if ($('mCloseOut')) $('mCloseOut').onclick = async () => {
+      if (!note()) { $('mErr').textContent = 'Add a note saying what was done (transferred to whom, answered, not a real lead).'; $('mNote').focus(); return; }
+      moveLead(l, 'closed', note(), by());
+      await done();
+    };
+    confirmLink('mDelete', 'delete lead permanently', async () => {
+      leads = leads.filter(x => x.id !== l.id); await persistLeads(); closeModal(); render();
+    });
+  }
+
+  function contactModal(){
+    const c = contacts.find(x => x.id === currentModal.id);
+    if (!c) return closeModal();
+    const ls = leadsFor(c.id);
+    modalEl.innerHTML = `
+      <div class="sl-modal-top"><h2 class="sl-modal-title">${escapeHtml(c.name || 'Contact')}</h2><button class="sl-close" id="mClose">&times;</button></div>
+      <div class="sl-section-label" style="margin-top:0;">Name</div>
+      <input class="sl-modal-input" id="cName" value="${escAttr(c.name)}" />
+      <div class="sl-field-pair">
+        <div><div class="sl-section-label">Phone</div><input class="sl-modal-input" id="cPhone" value="${escAttr(c.phone)}" /></div>
+        <div><div class="sl-section-label">Email</div><input class="sl-modal-input" id="cEmail" value="${escAttr(c.email)}" /></div>
+      </div>
+      <div class="sl-section-label">Service address</div>
+      <input class="sl-modal-input" id="cAddress" value="${escAttr(c.address)}" />
+      <div class="sl-section-label">Notes about this customer</div>
+      <textarea class="sl-modal-textarea" id="cNotes">${escapeHtml(c.notes)}</textarea>
+      <div class="sl-section-label">Leads (${ls.length})</div>
+      <div class="sl-linked-list">${ls.map(l => { const d = deptOf(l.department); return `<div class="sl-linked-item" data-openlead="${l.id}" style="cursor:pointer;">
+        <span>${escapeHtml(d ? d.short : 'Unassigned')} · ${escapeHtml((l.request || '').slice(0, 70))}</span>
+        <span class="sl-stage-chip ${l.stage}">${STAGE_LABEL[l.stage] || l.stage}</span></div>`; }).join('') || '<div style="color:var(--text-dim); font-size:12.5px;">No leads yet.</div>'}</div>
+      <button class="sl-btn sl-btn-ghost sl-btn-sm" id="cNewLead">+ New lead for this customer</button>
+      <div class="sl-modal-footer-row">${ls.length ? '<span style="font-size:11.5px; color:var(--text-dim);">Contacts with leads can\'t be deleted.</span>' : '<span class="sl-danger-link" id="mDelete">delete contact</span>'}
+        <button class="sl-btn sl-btn-primary sl-btn-sm" id="mSave">Save</button></div>`;
+    const $ = id => document.getElementById(id);
+    $('mClose').onclick = closeModal;
+    $('cNewLead').onclick = () => openNewLead({ contactId: c.id });
+    modalEl.querySelectorAll('[data-openlead]').forEach(el => el.onclick = () => openModal('lead', el.dataset.openlead));
+    if (!ls.length) confirmLink('mDelete', 'delete contact', async () => {
+      contacts = contacts.filter(x => x.id !== c.id); await persistContacts(); closeModal(); render();
+    });
+    $('mSave').onclick = async () => {
+      const name = $('cName').value.trim();
+      if (!name) { $('cName').focus(); return; }
+      c.name = name; c.phone = $('cPhone').value.trim(); c.email = $('cEmail').value.trim();
+      c.address = $('cAddress').value.trim(); c.notes = $('cNotes').value.trim(); c.updated = Date.now();
+      await persistContacts(); render(); closeModal();
     };
   }
 
